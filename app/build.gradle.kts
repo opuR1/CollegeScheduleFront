@@ -66,4 +66,6 @@ dependencies {
     // Асинхронные операции (Корутины)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
+    // DataStore для локального хранения
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
 }
