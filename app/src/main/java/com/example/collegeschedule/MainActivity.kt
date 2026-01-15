@@ -10,22 +10,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.collegeschedule.data.api.ScheduleApi
 import com.example.collegeschedule.data.repository.ScheduleRepository
 import com.example.collegeschedule.ui.schedule.ScheduleScreen
@@ -45,8 +34,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@PreviewScreenSizes
 @Composable
 fun CollegeScheduleApp() {
     var currentDestination by rememberSaveable {
@@ -55,7 +42,7 @@ fun CollegeScheduleApp() {
 
     val retrofit = remember {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:5051/") // localhost для Android Emulator
+            .baseUrl("http://10.0.2.2:5051/") // IP для эмулятора
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -69,12 +56,7 @@ fun CollegeScheduleApp() {
             NavigationBar {
                 AppDestinations.entries.forEach { destination ->
                     NavigationBarItem(
-                        icon = {
-                            Icon(
-                                destination.icon,
-                                contentDescription = destination.label
-                            )
-                        },
+                        icon = { Icon(destination.icon, contentDescription = destination.label) },
                         label = { Text(destination.label) },
                         selected = destination == currentDestination,
                         onClick = { currentDestination = destination }
@@ -83,12 +65,18 @@ fun CollegeScheduleApp() {
             }
         }
     ) { innerPadding ->
-        when (currentDestination) {
-            AppDestinations.HOME -> ScheduleScreen()
-            AppDestinations.FAVORITES ->
-                Text("Избранные группы", modifier = Modifier.padding(innerPadding))
-            AppDestinations.PROFILE ->
-                Text("Профиль студента", modifier = Modifier.padding(innerPadding))
+        // Surface добавлен, innerPadding применяется правильно
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            when (currentDestination) {
+                AppDestinations.HOME -> ScheduleScreen(repository)
+                AppDestinations.FAVORITES -> Text("Избранные группы")
+                AppDestinations.PROFILE -> Text("Профиль студента")
+            }
         }
     }
 }
