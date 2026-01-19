@@ -13,15 +13,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.collegeschedule.data.dto.ScheduleByDateDto
+import java.time.format.DateTimeFormatter
 @Composable
 fun ScheduleList(data: List<ScheduleByDateDto>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(data) { day ->
+
+            val formattedDate = day.lessonDate.toString().take(10)
+
             Text(
-                "${day.lessonDate} (${day.weekday})",
+                text = "$formattedDate (${day.weekday})",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(8.dp)
             )
+
             if (day.lessons.isEmpty()) {
                 Text("Информация отсутствует",
                     style = MaterialTheme.typography.bodyMedium,
@@ -35,12 +40,21 @@ fun ScheduleList(data: List<ScheduleByDateDto>) {
                             .fillMaxWidth()
                     ) {
                         Column(Modifier.padding(8.dp)) {
-                            Text("Пара ${lesson.lessonNumber} (${lesson.time})")
+                            Text("Пара ${lesson.lessonNumber} (${lesson.time})",
+                                style = MaterialTheme.typography.labelLarge)
+
                             lesson.groupParts.forEach { (part, info) ->
                                 if (info != null) {
-                                    Text("$part: ${info.subject}")
-                                    Text(info.teacher)
-                                    Text("${info.building}, ${info.classroom}")
+
+                                    val prefix = when (part.toString()) {
+                                        "SUB1" -> "Подгруппа 1: "
+                                        "SUB2" -> "Подгруппа 2: "
+                                        else -> ""
+                                    }
+
+                                    Text(text = "$prefix${info.subject}", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                                    Text(info.teacher, style = MaterialTheme.typography.bodySmall)
+                                    Text("${info.building}, каб. ${info.classroom}", style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
